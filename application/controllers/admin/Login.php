@@ -1,9 +1,9 @@
 <?php
 
-Class Login extends CI_Controller 
+Class Login extends MY_Controller
 {
     function index()
 	{
-        echo 'Login';
+        $this->load->view('admin/login/index');
 	}
 }
