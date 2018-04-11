@@ -7,7 +7,7 @@
     <div class="widget">
         <div class="title">
             <span class="titleIcon"><input id="titleCheck" name="titleCheck" type="checkbox"></span>
-            <h6>Danh sách Admin</h6>
+            <h6>Danh sách danh mục sản phẩm</h6>
             <div class="num f12">
                 Tổng số: <b><?php echo $total;?></b>
             </div>
@@ -20,8 +20,9 @@
                     	<img src="<?php echo public_url('admin')?>/images/icons/tableArrows.png">
                     </td>
                     <td style="width: 80px;">id</td>
-                    <td>Tên đăng nhập</td>
-                    <td>Họ tên</td>
+                    <td>Tên danh mục</td>
+                    <td>parent_id</td>
+                    <td>Thứ tự hiển thị</td>
                     <td style="width: 100px;">Hành động</td>
                 </tr>
             </thead>
@@ -36,6 +37,7 @@
                     </td>
                 </tr>
             </tfoot>
+
             <tbody>
                 <?php foreach ($list as $row):?>
                 <tr>
@@ -46,19 +48,24 @@
                     <td class="textC">
                         <?php echo $row->id?>
                     </td>
-                    <!--username -->
+                    <!--Tên danh mục -->
 
-
-                    <td>
-                      <span class="tipS" title="<?php echo $row->username?>"><?php echo $row->username?></span>
-                    </td>
-                    <!-- name -->
                     <td>
                       <span class="tipS" title="<?php echo $row->name?>"><?php echo $row->name?></span>
                     </td>
+
+                    <!-- parent_id -->
+                    <td>
+                      <span class="tipS" title="<?php echo $row->parent_id?>"><?php echo $row->parent_id?></span>
+                    </td>
+
+					<!--Thứ tự hiển thị -->
+                    <td>
+                      <span class="tipS" title="<?php echo $row->sort_order?>"><?php echo $row->sort_order?></span>
+                    </td>
                     <td class="option">
-                        <a class="tipS" href="<?php echo admin_url('admin/edit/'.$row->id)?>" title="Chỉnh sửa"><img src="<?php echo public_url('admin')?>/images/icons/color/edit.png"></a>
-                        <a class="tipS verify_action" href="<?php echo admin_url('admin/delete/'.$row->id)?>" title="Xóa"><img src="<?php echo public_url('admin')?>/images/icons/color/delete.png"></a>
+                        <a class="tipS" href="<?php echo admin_url('catalog/edit/'.$row->id)?>" title="Chỉnh sửa"><img src="<?php echo public_url('admin')?>/images/icons/color/edit.png"></a>
+                        <a class="tipS verify_action" href="<?php echo admin_url('catalog/delete/'.$row->id)?>" title="Xóa"><img src="<?php echo public_url('admin')?>/images/icons/color/delete.png"></a>
                     </td>
                 </tr>
                 <?php endforeach;?>

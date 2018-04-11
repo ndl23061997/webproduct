@@ -1,21 +1,21 @@
 <div class="titleArea">
 	<div class="wrapper">
 		<div class="pageTitle">
-			<h5>Admin</h5>
-			<span>Quản lý Admin</span>
+			<h5>Danh mục sản phẩm</h5>
+			<span>Quản lý danh mục sản phẩm</span>
 		</div>
 
 		<div class="horControlB menu_action">
 			<ul>
 				<li>
-    				<a href="<?php echo admin_url('admin/add')?>">
+    				<a href="<?php echo admin_url('catalog/add')?>">
         				<img src="<?php echo public_url('admin')?>/images/icons/control/16/add.png">
         				<span>Thêm mới</span>
     				</a>
 				</li>
 
 				<li>
-    				<a href="<?php echo admin_url('admin')?>">
+    				<a href="<?php echo admin_url('catalog')?>">
     				<img src="<?php echo public_url('admin')?>/images/icons/control/16/list.png">
     					<span>Danh sách</span>
     				</a>
