@@ -29,7 +29,7 @@
     							<input type="password" name="password" id="param_password">
     						</div>
     						<div class="clear"></div>
-    						<div style="color:red;font-weight:bold;;text-align:center"><?php echo form_error('login')?></div>
+    						<div style="color:red;font-weight:bold;text-align:center"><?php echo form_error('login')?></div>
     					</div>
     					<div class="loginControl">
     						<input type="hidden" name="submit" value="1"> <input type="submit" value="Đăng nhập" class="dredB logMeIn">

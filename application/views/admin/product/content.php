@@ -1,4 +1,8 @@
+
 <div class="wrapper" id="main_product">
+	<br>
+    	<?php if ($message <> '') { $this->load->view('admin/admin/message'); } ?>
+    <br>
 	<div class="widget">
 
 		<div class="title">
@@ -16,8 +20,7 @@
 			<thead class="filter">
 				<tr>
 					<td colspan="6">
-						<form class="list_filter form"
-							action="index.php/admin/product.html" method="get">
+						<form class="list_filter form" action="<?php echo admin_url('product');?>" method="get">
 							<table cellpadding="0" cellspacing="0" width="80%">
 								<tbody>
 
@@ -26,28 +29,42 @@
 											<label for="filter_id">Mã số</label>
 										</td>
 										<td class="item">
-											<input name="id" value="" id="filter_id" type="text" style="width: 55px;">
+											<input name="id" value="<?php echo $this->input->get('id');?>" id="filter_id" type="text" style="width: 55px;">
 										</td>
 
 										<td class="label" style="width: 40px;">
 											<label for="filter_id">Tên</label>
 										</td>
-										<td class="item" style="width: 155px;"><input name="name" value="" id="filter_iname" type="text" style="width: 155px;">
+										<td class="item" style="width: 155px;"><input name="name" value="<?php echo $this->input->get('name');?>" id="filter_iname" type="text" style="width: 155px;">
 										</td>
 
 										<td class="label" style="width: 60px;">
 											<label for="filter_status">Thể loại</label>
 										</td>
+										<!-- In ra danh sách các danh mục sản phẩm có trong CSDL. -->
 										<td class="item">
 											<select name="catalog">
-
+												<option value="">Tất cả danh mục</option>
+												<?php foreach ($catalogs as $row):?>
+													<?php if (count($row->subs) > 1):?>
+														<optgroup label="<?php echo $row->name?>">
+															<?php foreach ($row->subs as $sub):?>
+																<option value="<?php echo $sub->id?>" <?php echo ($sub->id == $this->input->get('catalog')) ? 'selected' : '' ?>>
+																	<?php echo $sub->name?>
+																</option>
+															<?php endforeach;?>
+														</optgroup>
+													<?php else:?>
+														<option value="<?php echo $row->id?>" <?php echo ($row->id == $this->input->get('catalog')) ? 'selected' : '' ?>>
+															<?php echo $row->name?>
+														</option>
+													<?php endif;?>
+												<?php endforeach;?>
 											</select>
 										</td>
 
-										<td style="width: 150px"><input type="submit"
-											class="button blueB" value="Lọc"> <input type="reset"
-											class="basic" value="Reset"
-											onclick="window.location.href = 'index.php/admin/product.html'; ">
+										<td style="width: 150px"><input type="submit" class="button blueB" value="Lọc">
+											<input type="reset" class="basic" value="Reset" onclick="window.location.href = '<?php echo admin_url('product/index')?>'; ">
 										</td>
 
 									</tr>
@@ -107,7 +124,7 @@
 
 					<td class="textR">
 						<?php if($row->discount >0):?>
-							<?php $new_price = $row->price - $row->discount?>
+							<?php $new_price = $row->price - ($row->discount*$row->price)/100?>
 							<p style="color:red;text-weight:blod"><?php echo number_format($new_price)?> đ</p>
 							<p style="text-decoration:line-through"><?php echo number_format($row->price)?> đ</p>
 						<?php else :?>

@@ -31,10 +31,44 @@ class product extends MY_Controller
 
 		$input = array();
 		$input['limit'] = array($config['per_page'], $segment);
+		// Kiểm tra có thực hiện lọc không
+		//Lọc bằng id
+		$id = $this->input->get('id');
+		$id = intval($id);
+		$input['where'] = array();
+		if($id > 0)
+		{
+			$input['where']['id'] = $id;
+		}
+		// Lọc theo tên
+		$name = $this->input->get('name');
+		if($name)
+		{
+			$input['like'] = array('name' , $name);
+		}
+		//Lọc theo $catalog_id
+		$catalog_id = $this->input->get('catalog');
+		$catalog_id = intval($catalog_id);
+		if($catalog_id > 0)
+		{
+			$input['where']['catalog_id'] = $catalog_id;
+		}
 
 		// Lấy ra danh sách các sản phẩm trong CSDL.
 		$list = $this->product_model->get_list($input);
 		$this->data['list'] = $list;
+		// Lấy ra danh mục các catalogs
+		$this->load->model('catalog_model');
+		$input['where'] = array ('parent_id' => 0);
+		$catalogs = $this->catalog_model->get_list($input);
+		foreach ($catalogs as $row	) {
+			$row->id = intval($row->id);
+			$input['where'] = array('parent_id' => $row->id);
+			$subs = $this->catalog_model->get_list($input);
+			$row->subs = $subs;
+		}
+		$this->data['catalogs'] = $catalogs;
+
 
 		// Load ra thông báo
 		$message = $this->session->flashdata('message');
@@ -44,5 +78,97 @@ class product extends MY_Controller
 		$this->load->view('admin/main', $this->data);
 	}
 
+	/*
+	 * Thêm mới sản phẩm
+	 */
+
+	function add ()
+	{
+		$input = array();
+		// Load thư viện quản kiểm tra lỗi trên form nhập liệu
+		$this->load->library('form_validation');
+		$this->load->helper('form');
+
+		// Nếu có dữ liệu gửi lên thì kiểm tra
+		if($this->input->post ("submit"))
+		{
+			$this->form_validation->set_rules('name', 'Tên danh mục', 'required');
+			$this->form_validation->set_rules('price', 'Giá sản phầm', 'required');
+			$this->form_validation->set_rules('discount', 'Giảm giá', 'required');
+
+			// Nếu nhập liệu chính xác
+			if($this->form_validation->run())
+			{
+				// Thêm vào CSDL
+				$name = $this->input->post('name');
+				$price = $this->input->post('price');
+				$price = str_replace(',','',$price);
+				$discount = $this->input->post('discount');
+				$catalog_id = $this->input->post('catalog');
+				$warranty = $this->input->post('warranty');
+				$gifts = $this->input->post('sale');
+				$site_title = $this->input->post('site_title');
+				$meta_desc = $this->input->post('meta_desc');
+				$meta_key = $this->input->post('meta_key');
+				$content = $this->input->post('content');
+
+				// Lấy tên file ảnh được upload.
+				$this->load->library('upload_library');
+				$upload_patch = './upload/product/';
+				$upload_data = $this->upload_library->upload($upload_patch, 'image');
+				$image_link = '';
+				if($upload_data['file_name'])
+				{
+					$image_link = $upload_data['file_name'];
+				}
+				// Upload các file ảnh kèm theo
+				$image_list = array();
+				$upload_data = $this->upload_library->upload_file($upload_patch, 'image_list');
+				$image_list = json_encode($image_list);
+
+				// Biến data để tạo trong csdl.
+				$data = array (
+						'name'       => $name,
+						'image_link' => $image_link,
+						'image_list' => $image_list,
+ 						'price'      => $price,
+						'discount'   => $discount,
+						'catalog_id' => $catalog_id,
+						'warranty'   => $warranty,
+						'gifts'      => $gifts,
+						'site_title' => $site_title,
+						'meta_desc'  => $meta_desc,
+						'meta_key'   => $meta_key,
+						'content'    => $content,
+						'created'    => now(),
+				);
+				// tạo sản phẩm mới trong CSDL.
+				if($this->product_model->create($data))
+				{
+					$this->session->set_flashdata('message', 'Thêm mới sản phẩm vào csdl thành công!');
+				}
+				else
+				{
+					$this->session->set_flashdata('message', 'Thêm thất bại! Vui lòng kiểm tra lại.');
+				}
+ 				redirect(admin_url('product'));
+			}
+
+		}
+		// Lấy ra danh sách các danh mục sản phẩm trong csdl.
+		$this->load->model('catalog_model');
+		$input['where'] = array ('parent_id' => 0);
+		$catalogs = $this->catalog_model->get_list($input);
+		foreach ($catalogs as $row	) {
+			$row->id = intval($row->id);
+			$input['where'] = array('parent_id' => $row->id);
+			$subs = $this->catalog_model->get_list($input);
+			$row->subs = $subs;
+		}
+		$this->data['catalogs'] = $catalogs;
+		// Layout master
+		$this->data['temp'] = 'admin/product/add';
+		$this->load->view('admin/main', $this->data);
+	}
 }
 ?>
