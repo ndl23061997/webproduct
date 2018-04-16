@@ -23,7 +23,7 @@ class Upload_library
 			$data = $this->CI->upload->data();
 		} else {
 			// không upload thanh công
-			$data = $this->CI->upload->display_errors();
+			$data = false;
 		}
 		return $data;
 	}
@@ -79,9 +79,47 @@ class Upload_library
 				// Nếu upload thành công thì lưu toàn bộ dữ liệu.
 				$data = $this->CI->upload->data();
 				// In cấu trúc dữ liệu của các file.
-				$image_list[$i] = $data['file_name'];
+				$image_list[] = $data['file_name'];
 			}
 		}
 		return $image_list;
+	}
+
+	/*
+	 * Xóa các ảnh đã upload trên CSDL
+	 */
+
+	function del_image($file_patch, $file_name)
+	{
+		$image_link = $file_patch.'/'.$file_name;
+		if(file_exists($image_link))
+		{
+			unlink($image_link);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	/*
+	 * Xóa danh sách các ảnh.
+	 */
+
+	function del_image_list($file_patch, $file_list)
+	{
+		$image_list = json_decode($file_list);
+		if(is_array($image_list))
+		{
+			foreach ($image_list as $image)
+			{
+				$image = $file_patch.'/'.$image;
+				if(file_exists($image))
+				{
+					unlink($image);
+				}
+			};
+		}
 	}
 }

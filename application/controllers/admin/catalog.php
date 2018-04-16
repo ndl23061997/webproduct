@@ -1,4 +1,4 @@
-<?php
+  <?php
 
 class catalog extends MY_Controller
 {
@@ -146,11 +146,11 @@ class catalog extends MY_Controller
     	$id = $this->uri->rsegment('3');
     	$id = intval($id);
 
-    	// Lấy ra thông tin của quản trị viên sau đó kiểm tra xem quản trị viên có tồn tại hay không.
+    	// Lấy ra thông tin của danh mục sau đó kiểm tra xem quản trị viên có tồn tại hay không.
     	$info = $this->catalog_model->get_info($id);
 		if (!$info)
 		{
-			$this->session->set_flashdata('message', 'Không tồn tại quản trị viên');
+			$this->session->set_flashdata('message', 'Không tồn tại danh mục này');
 			redirect(admin_url('catalog'));
 		}
 		// thực hiện xóa danh mục sản phẩm.

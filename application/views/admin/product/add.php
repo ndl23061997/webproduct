@@ -26,13 +26,13 @@
 								<span class="oneTwo"><input name="name" id="param_name"
 									_autocheck="true" type="text"></span> <span
 									name="name_autocheck" class="autocheck"></span>
-								<div name="name_error" class="clear error"></div>
+								<div name="name_error" class="clear error"><?php echo form_error('name');?></div>
 							</div>
 							<div class="clear"></div>
 						</div>
 
 						<div class="formRow">
-							<label class="formLeft">Hình ảnh:<span class="req">*</span></label>
+							<label class="formLeft">Hình ảnh: </label>
 							<div class="formRight">
 								<div class="left">
 									<input type="file" id="image" name="image">
@@ -67,14 +67,14 @@
 									style="margin-bottom: -8px"
 									src="<?php echo public_url('admin/')?>crown/images/icons/notifications/information.png">
 								</span> <span name="price_autocheck" class="autocheck"></span>
-								<div name="price_error" class="clear error"></div>
+								<div name="price_error" class="clear error"><?php echo form_error('price');?></div>
 							</div>
 							<div class="clear"></div>
 						</div>
 
 						<!-- Price -->
 						<div class="formRow">
-							<label class="formLeft" for="param_discount"> Giảm giá (VNĐ) <span></span>:
+							<label class="formLeft" for="param_discount"> Giảm giá (%) : <span class="req">*</span>
 							</label>
 							<div class="formRight">
 								<span> <input name="discount" style="width: 100px"
@@ -83,14 +83,14 @@
 									style="margin-bottom: -8px"
 									src="<?php echo public_url('admin/')?>crown/images/icons/notifications/information.png">
 								</span> <span name="discount_autocheck" class="autocheck"></span>
-								<div name="discount_error" class="clear error"></div>
+								<div name="discount_error" class="clear error"><?php echo form_error('discount');?></div>
 							</div>
 							<div class="clear"></div>
 						</div>
 
 						<!-- Select box hiển thị các danh mục sản phẩm -->
 						<div class="formRow">
-							<label class="formLeft" for="param_cat">Thể loại:<span class="req">*</span></label>
+							<label class="formLeft" for="param_cat">Thể loại: </label>
 							<div class="formRight">
 								<td class="item">
 									<select name="catalog">

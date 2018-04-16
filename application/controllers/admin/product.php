@@ -94,7 +94,7 @@ class product extends MY_Controller
 		{
 			$this->form_validation->set_rules('name', 'Tên danh mục', 'required');
 			$this->form_validation->set_rules('price', 'Giá sản phầm', 'required');
-			$this->form_validation->set_rules('discount', 'Giảm giá', 'required');
+			$this->form_validation->set_rules('discount', 'Giảm giá', 'required|is_natural_no_zero|less_than[100]');
 
 			// Nếu nhập liệu chính xác
 			if($this->form_validation->run())
@@ -124,6 +124,7 @@ class product extends MY_Controller
 				// Upload các file ảnh kèm theo
 				$image_list = array();
 				$upload_data = $this->upload_library->upload_file($upload_patch, 'image_list');
+				$image_list = $upload_data;
 				$image_list = json_encode($image_list);
 
 				// Biến data để tạo trong csdl.
@@ -169,6 +170,154 @@ class product extends MY_Controller
 		// Layout master
 		$this->data['temp'] = 'admin/product/add';
 		$this->load->view('admin/main', $this->data);
+	}
+
+	// Chỉnh sửa thông tin sản phẩm
+	function edit ()
+	{
+		$input = array();
+		// Load thư viện quản kiểm tra lỗi trên form nhập liệu
+		$this->load->library('form_validation');
+		$this->load->helper('form');
+
+		$id = $this->uri->rsegment('3');
+		$id = intval($id);
+		$product = $this->product_model->get_info($id);
+		if(empty($product))
+		{
+			$this->session->set_flashdata('message', 'Không tồn tại sản phẩm này');
+			redirect(admin_url('product'));
+		}
+		else
+		{
+			$image_link_old = $product->image_link;
+			$image_list_old = $product->image_list;
+		}
+		// Nếu có dữ liệu gửi lên thì kiểm tra
+		if($this->input->post ("submit"))
+		{
+
+			$this->form_validation->set_rules('name', 'Tên danh mục', 'required');
+			$this->form_validation->set_rules('price', 'Giá sản phầm', 'required');
+			$this->form_validation->set_rules('discount', 'Giảm giá', 'required|is_natural_no_zero|less_than[100]');
+
+			// Nếu nhập liệu chính xác
+			if($this->form_validation->run())
+			{
+				// Thêm vào CSDL
+
+				$name = $this->input->post('name');
+				$price = $this->input->post('price');
+				$price = str_replace(',','',$price);
+				$discount = $this->input->post('discount');
+				$catalog_id = $this->input->post('catalog');
+				$warranty = $this->input->post('warranty');
+				$gifts = $this->input->post('sale');
+				$site_title = $this->input->post('site_title');
+				$meta_desc = $this->input->post('meta_desc');
+				$meta_key = $this->input->post('meta_key');
+				$content = $this->input->post('content');
+
+				// Upload file ảnh của sản phẩm.
+				$this->load->library('upload_library');
+				$upload_patch = './upload/product/';
+				$upload_data = $this->upload_library->upload($upload_patch, 'image');
+				$image_link = '';
+				if($upload_data['file_name'])
+				{
+					$image_link = $upload_data['file_name'];
+				}
+				// Up load các file ảnh kèm theo.
+				$image_list = array();
+				$upload_data = $this->upload_library->upload_file($upload_patch, 'image_list');
+				$image_list = $upload_data;
+
+				// Biến data để tạo trong csdl.
+				$data = array (
+						'name'       => $name,
+						'price'      => $price,
+						'discount'   => $discount,
+						'catalog_id' => $catalog_id,
+						'warranty'   => $warranty,
+						'gifts'      => $gifts,
+						'site_title' => $site_title,
+						'meta_desc'  => $meta_desc,
+						'meta_key'   => $meta_key,
+						'content'    => $content,
+						'created'    => now(),
+				);
+				// Cập nhật ảnh của sản phẩm.
+				if ($image_link != '') {
+					$data = array('image_link' => $image_link);
+					// Xóa file ảnh cũ.
+					$this->upload_library->del_image('./upload/product', $image_link_old);
+				}
+				// Cập nhật image list.
+				if (!empty($image_list))
+				{
+					$image_list = json_encode($image_list);
+					$data['image_list'] = $image_list;
+					// Xóa các ảnh kèm theo.
+					$this->upload_library->del_image_list('./upload/product', $image_list_old);
+				}
+
+				// Cập nhật thông tin sản phẩm trong CSDL.
+				if($this->product_model->update($id,$data))
+				{
+					$this->session->set_flashdata('message', 'Thêm mới sản phẩm vào csdl thành công!');
+				}
+				else
+				{
+					$this->session->set_flashdata('message', 'Thêm thất bại! Vui lòng kiểm tra lại.');
+				}
+				redirect(admin_url('product'));
+			}
+
+		}
+
+		// Lấy ra danh sách các danh mục sản phẩm trong csdl.
+		$this->load->model('catalog_model');
+		$input['where'] = array ('parent_id' => 0);
+		$catalogs = $this->catalog_model->get_list($input);
+		foreach ($catalogs as $row	) {
+			$row->id = intval($row->id);
+			$input['where'] = array('parent_id' => $row->id);
+			$subs = $this->catalog_model->get_list($input);
+			$row->subs = $subs;
+		}
+		$this->data['catalogs'] = $catalogs;
+		// Layout master
+		$this->data['product'] = $product;
+		$this->data['temp'] = 'admin/product/edit';
+		$this->load->view('admin/main', $this->data);
+	}
+
+	function del()
+	{
+		// Load ra thư viện upload.
+		$this->load->library('upload_library');
+		// Lấy thông tin sản phẩm cần xóa.
+		$id = $this->uri->rsegment('3');
+		$id = intval($id);
+		$product = $this->product_model->get_info($id);
+		if(!$product)
+		{
+			$this->session->set_flashdata('message', 'Không tồn tại sản phẩm này');
+			redirect(admin_url('product'));
+		}
+		if($this->product_model->delete($id))
+		{
+			$this->session->set_flashdata('message', 'Xóa thành công!');
+		}
+		else
+		{
+			$this->session->set_flashdata('message', 'Lỗi! chưa xóa được');
+		}
+		// Xóa các ảnh của sản phẩm.
+		$this->upload_library->del_image('./upload/product/', $product->image_link);
+		// Xóa các ảnh kèm theo.
+		$this->upload_library->del_image_list('./upload/product/',$product->image_list);
+		redirect(admin_url('product'));
 	}
 }
 ?>

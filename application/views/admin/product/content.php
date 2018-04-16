@@ -140,10 +140,10 @@
 							title="Xem chi tiết sản phẩm"> <img
 								src="<? echo public_url('admin') ?>/images/icons/color/view.png">
 						</a>
-						<a href="admin/product/edit/9.html" title="Chỉnh sửa"
+						<a href="<?php echo admin_url('product/edit/'.$row->id)?>" title="Chỉnh sửa"
 							class="tipS"> <img src="<? echo public_url('admin') ?>/images/icons/color/edit.png">
 						</a>
-						<a href="admin/product/del/9.html" title="Xóa"
+						<a href="<?php echo admin_url('product/del/'.$row->id)?>" title="Xóa"
 							class="tipS verify_action"> <img
 								src="<? echo public_url('admin') ?>/images/icons/color/delete.png">
 						</a>
